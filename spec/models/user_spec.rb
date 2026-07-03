@@ -25,7 +25,7 @@ RSpec.describe User, type: :model do
       expect(duplicate).not_to be_valid
     end
 
-    it "is invalid with a password shorter than 8 characters" do
+    it "is invalid with a password shorter than 6 characters" do
       user = User.new(name: "Ana", email: "ana@test.com", password: "short")
       expect(user).not_to be_valid
     end
