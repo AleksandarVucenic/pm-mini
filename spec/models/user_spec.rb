@@ -30,4 +30,17 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
   end
+
+  describe "assigned_tasks association" do
+    it "nullifies assignee_id on tasks when the user is deleted" do
+      pm = User.create!(name: "Kirk", email: "kirk_del@test.com", password: "12345678")
+      assignee = User.create!(name: "Spock", email: "spock_del@test.com", password: "12345678")
+      project = Project.create!(name: "Test Project", pm: pm)
+      task = Task.create!(title: "Test task", project: project, assignee: assignee)
+
+      assignee.destroy!
+
+      expect(task.reload.assignee_id).to be_nil
+    end
+  end
 end
