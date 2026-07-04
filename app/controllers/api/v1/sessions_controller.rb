@@ -1,18 +1,17 @@
 class Api::V1::SessionsController < Devise::SessionsController
-  include Response
   respond_to :json
 
   private
 
   def respond_with(resource, _opts = {})
-    success(data: {user: UserSerializer.call(resource)}, message: "Logged in successfully", status: :ok)
+    render json: UserSerializer.new(resource).serializable_hash, status: :ok
   end
 
   def respond_to_on_destroy(*)
     if current_user
-      success(data: nil, message: "Logged out successfully", status: :ok)
+      render json: { data: { message: "Logged out successfully" } }, status: :ok
     else
-      unauthorized(message: "Not logged in")
+      render json: ErrorSerializer.from_message("Not logged in", status: :unauthorized), status: :unauthorized
     end
   end
 end
