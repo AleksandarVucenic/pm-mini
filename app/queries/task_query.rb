@@ -31,9 +31,10 @@ class TaskQuery
   def filter_by_term(scope)
     return scope unless params[:term].present?
 
+    sanitized_term = ActiveRecord::Base.sanitize_sql_like(params[:term])
     scope.joins(:project).where(
       "tasks.title LIKE :term OR projects.name LIKE :term",
-      term: "%#{params[:term]}%"
+      term: "%#{sanitized_term}%"
     )
   end
 end

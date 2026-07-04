@@ -158,5 +158,20 @@ RSpec.describe "Api::V1::Tasks", type: :request do
 
       expect(response).to have_http_status(:forbidden)
     end
+
+    it "allows the assignee to update title/description/status, but NOT project_id or assignee_id" do
+      other_project = Project.create!(name: "Different Project", pm: kirk)
+      task = Task.create!(title: "My task", project: project, assignee: spock)
+
+      patch "/api/v1/tasks/#{task.id}",
+            params: { task: { title: "Renamed by assignee", project_id: other_project.id, assignee_id: mccoy.id } },
+            headers: auth_headers(spock)
+
+      expect(response).to have_http_status(:ok)
+      task.reload
+      expect(task.title).to eq("Renamed by assignee")   # dozvoljeno polje - promenjeno
+      expect(task.project_id).to eq(project.id)             # zabranjeno polje - NIJE promenjeno
+      expect(task.assignee_id).to eq(spock.id)                # zabranjeno polje - NIJE promenjeno
+    end
   end
 end

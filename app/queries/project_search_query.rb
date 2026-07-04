@@ -7,9 +7,9 @@ class ProjectSearchQuery
   def call
     return relation unless term.present?
 
-    relation.where("projects.name LIKE :term", term: "%#{term}%")
+    sanitized_term = ActiveRecord::Base.sanitize_sql_like(term)
+    relation.where("projects.name LIKE :term", term: "%#{sanitized_term}%")
   end
-
   private
 
   attr_reader :relation, :term
