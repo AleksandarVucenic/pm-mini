@@ -24,4 +24,10 @@ class ProjectPolicy < ApplicationPolicy
   def pm?
     record.pm_id == user.id
   end
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      scope.all
+    end
+  end
 end

@@ -3,6 +3,8 @@ class Api::V1::BaseController < ApplicationController
   include Paginatable
 
   before_action :authenticate_user!
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
   rescue_from ActiveRecord::RecordNotFound do |e|
     render json: ErrorSerializer.from_message(e.message, status: :not_found), status: :not_found
