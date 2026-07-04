@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_161611) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_170106) do
   create_table "jwt_denylists", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
@@ -26,6 +26,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_161611) do
     t.index ["pm_id"], name: "index_projects_on_pm_id"
   end
 
+  create_table "tasks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "assignee_id"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.bigint "project_id", null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assignee_id"], name: "index_tasks_on_assignee_id"
+    t.index ["project_id", "assignee_id", "status"], name: "index_tasks_on_project_id_and_assignee_id_and_status"
+    t.index ["project_id"], name: "index_tasks_on_project_id"
+    t.index ["status"], name: "index_tasks_on_status"
+    t.index ["title"], name: "index_tasks_on_title"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -37,4 +52,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_161611) do
   end
 
   add_foreign_key "projects", "users", column: "pm_id"
+  add_foreign_key "tasks", "projects"
+  add_foreign_key "tasks", "users", column: "assignee_id"
 end
