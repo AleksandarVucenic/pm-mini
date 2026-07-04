@@ -47,7 +47,7 @@ module Response
   end
 
   def validation_error(errors, message: "Validation failed")
-    error(message: message, status: :unprocessable_entity, errors: errors)
+    error(message: message, status: :unprocessable_content, errors: errors)
   end
 
   def server_error(message: "Internal server error")

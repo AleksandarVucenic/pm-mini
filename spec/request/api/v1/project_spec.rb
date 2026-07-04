@@ -25,6 +25,20 @@ RSpec.describe "Api::V1::Projects", type: :request do
       get "/api/v1/projects"
       expect(response).to have_http_status(:unauthorized)
     end
+
+    it "shows a single project to any authenticated user" do
+      project = Project.create!(name: "Project A", pm: kirk)
+
+      get "/api/v1/projects/#{project.id}", headers: auth_headers(spock)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns not_found for a nonexistent project" do
+      get "/api/v1/projects/999999", headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   describe "POST /api/v1/projects" do
@@ -49,23 +63,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
     it "returns validation errors without a name" do
       post "/api/v1/projects", params: { project: { name: "" } }, headers: auth_headers(kirk)
 
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
-  end
-
-  describe "GET /api/v1/projects/:id" do
-    it "shows a single project to any authenticated user" do
-      project = Project.create!(name: "Project A", pm: kirk)
-
-      get "/api/v1/projects/#{project.id}", headers: auth_headers(spock)
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    it "returns not_found for a nonexistent project" do
-      get "/api/v1/projects/999999", headers: auth_headers(kirk)
-
-      expect(response).to have_http_status(:not_found)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -78,6 +76,23 @@ RSpec.describe "Api::V1::Projects", type: :request do
       expect(response).to have_http_status(:ok)
       expect(project.reload.name).to eq("New Name")
     end
+
+    it "allows the pm to update their own project" do
+      project = Project.create!(name: "Old Name", pm: kirk)
+
+      patch "/api/v1/projects/#{project.id}", params: { project: { name: "New Name" } }, headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "forbids a non-pm from updating the project" do
+      project = Project.create!(name: "Old Name", pm: kirk)
+
+      patch "/api/v1/projects/#{project.id}", params: { project: { name: "Hacked Name" } }, headers: auth_headers(spock)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(project.reload.name).to eq("Old Name")
+    end
   end
 
   describe "DELETE /api/v1/projects/:id" do
@@ -88,6 +103,15 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(Project.exists?(project.id)).to be false
+    end
+
+    it "forbids a non-pm from deleting the project" do
+      project = Project.create!(name: "To Keep", pm: kirk)
+
+      delete "/api/v1/projects/#{project.id}", headers: auth_headers(spock)
+
+      expect(response).to have_http_status(:forbidden)
+      expect(Project.exists?(project.id)).to be true
     end
   end
 end

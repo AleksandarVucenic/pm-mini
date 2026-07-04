@@ -2,12 +2,14 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   before_action :set_project, only: [:show, :update, :destroy]
 
   def index
-    projects = Project.includes(:pm)
+    projects = ProjectTaskCountsQuery.new.call
     success(data: projects.map { |p| ProjectSerializer.call(p) })
   end
 
   def show
-    success(data: ProjectSerializer.call(@project))
+    authorize @project
+    project = ProjectTaskCountsQuery.new(relation: Project.where(id: @project.id)).call.first
+    success(data: ProjectSerializer.call(project))
   end
 
   def create
@@ -17,11 +19,13 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   end
 
   def update
+    authorize @project
     @project.update!(project_params)
     success(data: ProjectSerializer.call(@project), message: "Project updated successfully")
   end
 
   def destroy
+    authorize @project
     @project.destroy!
     success(message: "Project deleted successfully")
   end
