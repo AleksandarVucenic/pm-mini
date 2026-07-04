@@ -1,4 +1,7 @@
 class Api::V1::SessionsController < Devise::SessionsController
+  rate_limit to: 5, within: 3.minutes, only: :create,
+             with: -> { render json: ErrorSerializer.from_message("Too many login attempts. Please try again later.", status: :too_many_requests), status: :too_many_requests }
+
   respond_to :json
 
   private

@@ -54,4 +54,16 @@ RSpec.describe "Api::V1::Sessions", type: :request do
     expect(json["errors"]).to be_present
     expect(json["errors"].first["status"]).to eq("401")
   end
+
+  describe "rate limiting" do
+    it "blocks login after 5 failed attempts within 3 minutes" do
+      6.times do
+        post "/api/v1/login", params: { user: { email: "kirk@test.com", password: "wrong" } }
+      end
+
+      expect(response).to have_http_status(:too_many_requests)
+      json = JSON.parse(response.body)
+      expect(json["errors"].first["detail"]).to include("Too many login attempts")
+    end
+  end
 end
