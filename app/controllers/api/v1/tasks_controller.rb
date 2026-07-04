@@ -2,9 +2,9 @@ class Api::V1::TasksController < Api::V1::BaseController
   before_action :set_task, only: [ :show, :update, :destroy ]
 
   def index
-    scope = TaskQuery.new(relation: policy_scope(Task), params: params).call
-    pagy, tasks = paginate(scope)
-    render json: TaskSerializer.new(tasks, meta: pagination_meta(pagy)).serializable_hash
+    tasks = TaskQuery.new(relation: policy_scope(Task), params: params).call
+    pagy, paginated = paginate(tasks)
+    render json: TaskSerializer.new(paginated, meta: pagination_meta(pagy)).serializable_hash
   end
 
   def show
@@ -15,13 +15,17 @@ class Api::V1::TasksController < Api::V1::BaseController
   def create
     task = Task.new(task_params)
     authorize task
-    task.save!
+    Tasks::LockedSave.new(task).call
     render json: TaskSerializer.new(task).serializable_hash, status: :created
   end
 
   def update
     authorize @task
-    @task.update!(task_params)
+
+    permitted = pm_of_task?(@task) ? task_params : assignee_task_params
+    @task.assign_attributes(permitted)
+    Tasks::LockedSave.new(@task).call
+
     render json: TaskSerializer.new(@task).serializable_hash
   end
 
@@ -37,7 +41,15 @@ class Api::V1::TasksController < Api::V1::BaseController
     @task = Task.find(params[:id])
   end
 
+  def pm_of_task?(task)
+    task.project.pm_id == current_user.id
+  end
+
   def task_params
     params.require(:task).permit(:title, :description, :status, :project_id, :assignee_id)
+  end
+
+  def assignee_task_params
+    params.require(:task).permit(:title, :description, :status)
   end
 end

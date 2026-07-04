@@ -2,10 +2,10 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   before_action :set_project, only: [ :show, :update, :destroy ]
 
   def index
-    filtered = ProjectSearchQuery.new(term: params[:term]).call
-    pagy, paginated_projects = paginate(filtered)
-    results = ProjectTaskCountsQuery.new(relation: paginated_projects).call
-    render json: ProjectSerializer.new(results, meta: pagination_meta(pagy)).serializable_hash
+    filtered = ProjectSearchQuery.new(relation: policy_scope(Project), term: params[:term]).call
+    results = ProjectTaskCountsQuery.new(relation: filtered).call
+    pagy, paginated_results = paginate(results)
+    render json: ProjectSerializer.new(paginated_results, meta: pagination_meta(pagy)).serializable_hash
   end
 
   def show
