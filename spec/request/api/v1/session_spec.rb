@@ -11,8 +11,7 @@ RSpec.describe "Api::V1::Sessions", type: :request do
       expect(response.headers["Authorization"]).to be_present
 
       json = JSON.parse(response.body)
-      expect(json["success"]).to eq(true)
-      expect(json["data"]["user"]["email"]).to eq("kirk@test.com")
+      expect(json["data"]["attributes"]["email"]).to eq("kirk@test.com")
     end
 
     it "returns unauthorized with wrong password" do
@@ -45,5 +44,14 @@ RSpec.describe "Api::V1::Sessions", type: :request do
 
       expect(response).to have_http_status(:unauthorized)
     end
+  end
+
+  it "returns unauthorized with wrong password in JSON:API error format" do
+    post "/api/v1/login", params: { user: { email: "kirk@test.com", password: "pogresna" } }
+
+    expect(response).to have_http_status(:unauthorized)
+    json = JSON.parse(response.body)
+    expect(json["errors"]).to be_present
+    expect(json["errors"].first["status"]).to eq("401")
   end
 end
