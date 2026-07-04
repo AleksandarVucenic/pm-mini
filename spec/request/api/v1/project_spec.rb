@@ -36,7 +36,6 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
     it "returns not_found for a nonexistent project" do
       get "/api/v1/projects/999999", headers: auth_headers(kirk)
-
       expect(response).to have_http_status(:not_found)
     end
   end
@@ -47,8 +46,8 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["name"]).to eq("Enterprise Refit")
-      expect(json["data"]["pm"]["id"]).to eq(kirk.id)
+      expect(json["data"]["attributes"]["name"]).to eq("Enterprise Refit")
+      expect(json["data"]["attributes"]["pm"]["id"]).to eq(kirk.id)
     end
 
     it "ignores a pm_id sent in the request body" do
@@ -57,12 +56,11 @@ RSpec.describe "Api::V1::Projects", type: :request do
            headers: auth_headers(kirk)
 
       json = JSON.parse(response.body)
-      expect(json["data"]["pm"]["id"]).to eq(kirk.id)
+      expect(json["data"]["attributes"]["pm"]["id"]).to eq(kirk.id)
     end
 
     it "returns validation errors without a name" do
       post "/api/v1/projects", params: { project: { name: "" } }, headers: auth_headers(kirk)
-
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
@@ -101,7 +99,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
       delete "/api/v1/projects/#{project.id}", headers: auth_headers(kirk)
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:no_content)
       expect(Project.exists?(project.id)).to be false
     end
 
@@ -112,6 +110,30 @@ RSpec.describe "Api::V1::Projects", type: :request do
 
       expect(response).to have_http_status(:forbidden)
       expect(Project.exists?(project.id)).to be true
+    end
+  end
+
+  describe "pagination" do
+    it "includes pagination meta in the response" do
+      3.times { |i| Project.create!(name: "Project #{i}", pm: kirk) }
+
+      get "/api/v1/projects?per_page=2", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(2)
+      expect(json["meta"]["current_page"]).to eq(1)
+      expect(json["meta"]["page_size"]).to eq(2)
+      expect(json["meta"]["total_count"]).to eq(3)
+    end
+
+    it "returns the second page correctly" do
+      3.times { |i| Project.create!(name: "Project #{i}", pm: kirk) }
+
+      get "/api/v1/projects?per_page=2&page=2", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(1)
+      expect(json["meta"]["current_page"]).to eq(2)
     end
   end
 end
