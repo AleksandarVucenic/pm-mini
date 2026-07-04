@@ -1,0 +1,2479 @@
+{
+  "info": {
+    "name": "Project Management System API",
+    "description": "Productive backend assignment API \u2014 full manual test pass.\n\nSETUP: run `rails db:reset && rails db:seed` before running this collection, so IDs match what these requests expect (project 1 = Enterprise Refit / PM Kirk, project 2 = Voyager Refit / PM Scotty).\n\nRUN ORDER MATTERS: folders are ordered top to bottom on purpose (Auth -> Users -> Projects -> Tasks -> Logout). The Logout folder revokes tokens, so it must run last, or later requests using the same token will fail with 401 (which is correct behavior, not a bug).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "kirk_token",
+      "value": ""
+    },
+    {
+      "key": "spock_token",
+      "value": ""
+    },
+    {
+      "key": "scotty_token",
+      "value": ""
+    },
+    {
+      "key": "mccoy_token",
+      "value": ""
+    },
+    {
+      "key": "sulu_token",
+      "value": ""
+    },
+    {
+      "key": "created_project_id",
+      "value": ""
+    },
+    {
+      "key": "created_task_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Login as Kirk",
+          "description": "Logs in as Kirk and stores the JWT in the `kirk_token` collection variable for use by every other request.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "pm.collectionVariables.set('kirk_token', authHeader);",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Authorization header is present', () => pm.expect(authHeader).to.not.be.null);",
+                  "const body = pm.response.json();",
+                  "pm.test('Response follows JSON:API shape', () => {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data).to.have.property('type');",
+                  "  pm.expect(body.data.attributes).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"kirk@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as Spock",
+          "description": "Logs in as Spock and stores the JWT in the `spock_token` collection variable for use by every other request.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "pm.collectionVariables.set('spock_token', authHeader);",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Authorization header is present', () => pm.expect(authHeader).to.not.be.null);",
+                  "const body = pm.response.json();",
+                  "pm.test('Response follows JSON:API shape', () => {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data).to.have.property('type');",
+                  "  pm.expect(body.data.attributes).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"spock@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as Scotty",
+          "description": "Logs in as Scotty and stores the JWT in the `scotty_token` collection variable for use by every other request.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "pm.collectionVariables.set('scotty_token', authHeader);",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Authorization header is present', () => pm.expect(authHeader).to.not.be.null);",
+                  "const body = pm.response.json();",
+                  "pm.test('Response follows JSON:API shape', () => {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data).to.have.property('type');",
+                  "  pm.expect(body.data.attributes).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"scotty@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as McCoy",
+          "description": "Logs in as McCoy and stores the JWT in the `mccoy_token` collection variable for use by every other request.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "pm.collectionVariables.set('mccoy_token', authHeader);",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Authorization header is present', () => pm.expect(authHeader).to.not.be.null);",
+                  "const body = pm.response.json();",
+                  "pm.test('Response follows JSON:API shape', () => {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data).to.have.property('type');",
+                  "  pm.expect(body.data.attributes).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"mccoy@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as Sulu",
+          "description": "Logs in as Sulu and stores the JWT in the `sulu_token` collection variable for use by every other request.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const authHeader = pm.response.headers.get('Authorization');",
+                  "pm.collectionVariables.set('sulu_token', authHeader);",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Authorization header is present', () => pm.expect(authHeader).to.not.be.null);",
+                  "const body = pm.response.json();",
+                  "pm.test('Response follows JSON:API shape', () => {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data).to.have.property('type');",
+                  "  pm.expect(body.data.attributes).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"sulu@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login with wrong password \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error response follows JSON:API error shape', () => pm.expect(body.errors[0]).to.have.property('detail'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"kirk@enterprise.com\",\n    \"password\": \"wrongpassword\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login with non-existent email \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"noone@enterprise.com\",\n    \"password\": \"starfleet123\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Login with wrong password gives the SAME error as non-existent email (no user enumeration)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('wrong_password_detail', body.errors[0].detail);",
+                  "pm.test('Recorded error detail for comparison', () => pm.expect(body.errors[0].detail).to.not.be.undefined);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"email\": \"kirk@enterprise.com\",\n    \"password\": \"wrongpassword\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Access a protected route with no token \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Access a protected route with a garbage token \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer this.is.not.a.valid.jwt"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Users",
+      "item": [
+        {
+          "name": "List all users \u2014 every authenticated user can see everyone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Returns all 7 seeded users', () => pm.expect(body.data.length).to.eql(7));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Projects",
+      "item": [
+        {
+          "name": "List all projects as Kirk (PM sees ALL projects, not just his own)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Includes both Enterprise Refit and Voyager Refit', () => {",
+                  "  const names = body.data.map(p => p.attributes.name);",
+                  "  pm.expect(names).to.include('Enterprise Refit');",
+                  "  pm.expect(names).to.include('Voyager Refit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List all projects as Scotty \u2014 confirms 'all users see all projects' regardless of role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Scotty (PM of Voyager only) still sees both projects', () => pm.expect(body.data.length).to.be.at.least(2));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{scotty_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show Enterprise Refit \u2014 verify response shape (name, pm, open/closed counts)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const attrs = pm.response.json().data.attributes;",
+                  "pm.test('Has name', () => pm.expect(attrs.name).to.eql('Enterprise Refit'));",
+                  "pm.test('Has embedded pm with id/name/email', () => {",
+                  "  pm.expect(attrs.pm).to.have.all.keys('id', 'name', 'email');",
+                  "  pm.expect(attrs.pm.email).to.eql('kirk@enterprise.com');",
+                  "});",
+                  "pm.test('Has open_tasks_count and closed_tasks_count as numbers', () => {",
+                  "  pm.expect(attrs.open_tasks_count).to.be.a('number');",
+                  "  pm.expect(attrs.closed_tasks_count).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show a non-existent project \u2014 expect 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search projects by term 'enterprise' \u2014 matches only project name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Only Enterprise Refit matches', () => {",
+                  "  pm.expect(body.data.length).to.eql(1);",
+                  "  pm.expect(body.data[0].attributes.name).to.eql('Enterprise Refit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects?term=enterprise",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "term",
+                  "value": "enterprise"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search projects by term 'ENTERPRISE' (uppercase) \u2014 case insensitive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Case-insensitive match still finds it', () => pm.expect(body.data.length).to.eql(1));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects?term=ENTERPRISE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "term",
+                  "value": "ENTERPRISE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search projects by a term matching a TASK title \u2014 should NOT match (projects only match by project name)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('No projects match a task-title-only term', () => pm.expect(body.data.length).to.eql(0));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects?term=warp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "term",
+                  "value": "warp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Paginate projects, per_page=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Returns exactly 1 project', () => pm.expect(body.data.length).to.eql(1));",
+                  "pm.test('Meta reflects pagination state', () => {",
+                  "  pm.expect(body.meta.current_page).to.eql(1);",
+                  "  pm.expect(body.meta.page_size).to.eql(1);",
+                  "  pm.expect(body.meta.total_count).to.be.at.least(2);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects?per_page=1&page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create a project as Spock \u2014 Spock is automatically set as PM",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('PM is Spock, the creator', () => pm.expect(body.data.attributes.pm.email).to.eql('spock@enterprise.com'));",
+                  "pm.collectionVariables.set('created_project_id', body.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project\": {\n    \"name\": \"Spock's Science Vessel\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create a project while sneaking a pm_id in the body \u2014 pm_id is ignored",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('PM is STILL Spock (the pm_id=1/Kirk in the body was ignored)', () => {",
+                  "  pm.expect(body.data.attributes.pm.email).to.eql('spock@enterprise.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project\": {\n    \"name\": \"Attempted PM Spoof\",\n    \"pm_id\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create a project without a name \u2014 expect 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', () => pm.response.to.have.status(422));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error follows JSON:API error shape', () => pm.expect(body.errors[0].status).to.eql('422'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project\": {\n    \"name\": \"\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Kirk updates his OWN project (Enterprise Refit) \u2014 expect 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project\": {\n    \"name\": \"Enterprise Refit\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Scotty (not the PM) tries to update Enterprise Refit \u2014 expect 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error is JSON:API forbidden shape', () => pm.expect(body.errors[0].status).to.eql('403'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{scotty_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"project\": {\n    \"name\": \"Hacked by Scotty\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Spock deletes the project he just created \u2014 expect 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/{{created_project_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "{{created_project_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Scotty (not the PM) tries to delete Enterprise Refit \u2014 expect 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{scotty_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Tasks",
+      "item": [
+        {
+          "name": "List tasks as PM (Kirk), scoped to Enterprise Refit \u2014 sees ALL tasks, assigned or not",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Sees all 4 seeded tasks in Enterprise Refit, including the unassigned one', () => {",
+                  "  pm.expect(body.data.length).to.eql(4);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "project_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[AUTH] List tasks as assignee (Spock) \u2014 sees ONLY tasks assigned to him, across all projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Every returned task is assigned to Spock', () => {",
+                  "  body.data.forEach(t => pm.expect(t.attributes.assignee.email).to.eql('spock@enterprise.com'));",
+                  "});",
+                  "pm.test('Spock does NOT see the unassigned task or McCoy\\'s task', () => {",
+                  "  const titles = body.data.map(t => t.attributes.title);",
+                  "  pm.expect(titles).to.not.include('Unassigned maintenance task');",
+                  "  pm.expect(titles).to.not.include('Restock sickbay');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[AUTH] List tasks as Kirk (PM of Enterprise, but only ASSIGNEE on Voyager) \u2014 role is per-project",
+          "description": "Demonstrates that role is contextual, not global: Kirk is PM of one project and a plain assignee on another, and the visible task set reflects both roles simultaneously.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const projectNames = body.data.map(t => t.attributes.project.name);",
+                  "pm.test('Sees all Enterprise Refit tasks (he is PM there)', () => {",
+                  "  pm.expect(projectNames.filter(n => n === 'Enterprise Refit').length).to.eql(4);",
+                  "});",
+                  "pm.test('Sees exactly his OWN assigned task in Voyager Refit, not Uhura\\'s', () => {",
+                  "  const voyagerTasks = body.data.filter(t => t.attributes.project.name === 'Voyager Refit');",
+                  "  pm.expect(voyagerTasks.length).to.eql(1);",
+                  "  pm.expect(voyagerTasks[0].attributes.assignee.email).to.eql('kirk@enterprise.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter tasks by status=open",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('All returned tasks are open', () => body.data.forEach(t => pm.expect(t.attributes.status).to.eql('open')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1&status=open",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "project_id",
+                  "value": "1"
+                },
+                {
+                  "key": "status",
+                  "value": "open"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter tasks by status=closed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('All returned tasks are closed', () => body.data.forEach(t => pm.expect(t.attributes.status).to.eql('closed')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1&status=closed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "project_id",
+                  "value": "1"
+                },
+                {
+                  "key": "status",
+                  "value": "closed"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search tasks by term matching TASK TITLE ('warp')",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Matches the warp core task', () => {",
+                  "  pm.expect(body.data.some(t => t.attributes.title.toLowerCase().includes('warp'))).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?term=warp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "term",
+                  "value": "warp"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search tasks by term matching PROJECT NAME ('voyager') \u2014 spec requires matching on either field",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "pm.test('Returns tasks belonging to Voyager Refit even though the term doesn\\'t match any task title', () => {",
+                  "  pm.expect(body.data.length).to.be.at.least(1);",
+                  "  body.data.forEach(t => pm.expect(t.attributes.project.name).to.eql('Voyager Refit'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?term=voyager",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "term",
+                  "value": "voyager"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show a single task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show a non-existent task \u2014 expect 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "PM (Kirk) creates a task in his own project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('created_task_id', body.data.id);",
+                  "pm.test('Defaults to open status, no assignee', () => {",
+                  "  pm.expect(body.data.attributes.status).to.eql('open');",
+                  "  pm.expect(body.data.attributes.assignee).to.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Recalibrate deflector array\",\n    \"project_id\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Non-PM (Spock, only assignee) tries to create a task in Enterprise Refit \u2014 expect 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sneaky task\",\n    \"project_id\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Kirk (PM of Enterprise, NOT of Voyager) tries to create a task in Voyager Refit \u2014 expect 403",
+          "description": "Confirms PM authorization is project-scoped: being PM of one project grants no create rights on another.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Overstepping into Voyager\",\n    \"project_id\": 2\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Task without a title \u2014 expect 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', () => pm.response.to.have.status(422));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"project_id\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "PM (Kirk) updates any field on an unassigned task in his project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "4"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Unassigned maintenance task (renamed by PM)\",\n    \"description\": \"Updated by PM directly\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Assignee (Spock) closes his own assigned task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Status is now closed', () => pm.expect(body.data.attributes.status).to.eql('closed'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Assignee (Spock) tries to update a task NOT assigned to him \u2014 expect 403",
+          "description": "Task 3 (Restock sickbay) is assigned to McCoy, not Spock.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "3"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[AUTH] An unrelated user (Scotty \u2014 not PM, not assignee on this Enterprise Refit task) tries to update it \u2014 expect 403",
+          "description": "Scotty is PM of Voyager Refit only \u2014 he has no PM or assignee relationship to this task, which belongs to Enterprise Refit.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{scotty_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "3"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "PM (Kirk) deletes the task he just created",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/{{created_task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "{{created_task_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[AUTH] Non-PM (Spock) tries to delete a task \u2014 expect 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Business Rule \u2014 Max 5 Open Tasks Per Assignee Per Project",
+      "item": [
+        {
+          "name": "Create open task #1 for Sulu in Enterprise Refit (building up to the limit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Task #1 created successfully (201)', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 1\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create open task #2 for Sulu in Enterprise Refit (building up to the limit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Task #2 created successfully (201)', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 2\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create open task #3 for Sulu in Enterprise Refit (building up to the limit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Task #3 created successfully (201)', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 3\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create open task #4 for Sulu in Enterprise Refit (building up to the limit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Task #4 created successfully (201)', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 4\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Create open task #5 for Sulu in Enterprise Refit (building up to the limit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Task #5 created successfully (201)', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 5\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[BUSINESS RULE] A 6th OPEN task for Sulu in the SAME project \u2014 expect 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', () => pm.response.to.have.status(422));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error message explains the 5-open-tasks limit', () => {",
+                  "  pm.expect(body.errors[0].detail).to.include('already has 5 open tasks');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (one too many)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[BUSINESS RULE] A 6th task for Sulu is fine if it's CLOSED, not open",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201 \u2014 closed tasks do not count toward the limit', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (closed, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"closed\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[BUSINESS RULE] A 6th OPEN task for Sulu is fine in a DIFFERENT project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201 \u2014 the limit is per-project', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{scotty_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task in Voyager (different project, should be fine)\",\n    \"project_id\": 2,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "[BUSINESS RULE] A 6th OPEN task in the same project is fine for a DIFFERENT assignee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201 \u2014 the limit is per-assignee', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"McCoy task (different assignee, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 5,\n    \"status\": \"open\"\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Ordering",
+      "item": [
+        {
+          "name": "Verify tasks are ordered by updated_at DESCENDING (most recently updated first)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "const dates = body.data.map(t => new Date(t.attributes.updated_at).getTime());",
+                  "const sorted = [...dates].sort((a, b) => b - a);",
+                  "pm.test('Tasks are returned newest-updated first', () => pm.expect(dates).to.eql(sorted));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "project_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Logout & Token Revocation (RUN THIS LAST)",
+      "description": "Revokes tokens. Must run after every other folder, or subsequent requests reusing kirk_token will fail.",
+      "item": [
+        {
+          "name": "Logout as Kirk (revokes his token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[VERIFY] Kirk's revoked token can no longer be used \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401 (token was revoked)', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/projects",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout with no token \u2014 expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
