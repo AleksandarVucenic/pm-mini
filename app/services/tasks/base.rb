@@ -1,19 +1,19 @@
-class Tasks::Save
+class Tasks::Base
   def initialize(task)
     @task = task
   end
 
-  def call
+  private
+
+  attr_reader :task
+
+  def persist!
     ActiveRecord::Base.transaction do
       task.project.lock!
       check_open_task_limit!
       task.save!
     end
   end
-
-  private
-
-  attr_reader :task
 
   def check_open_task_limit!
     return unless task.assignee_id.present? && task.open?

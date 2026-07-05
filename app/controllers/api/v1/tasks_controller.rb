@@ -15,14 +15,14 @@ class Api::V1::TasksController < Api::V1::BaseController
   def create
     task = Task.new(task_params)
     authorize task
-    Tasks::Save.new(task).call
+    Tasks::Create.new(task).call
     render json: TaskSerializer.new(task).serializable_hash, status: :created
   end
 
   def update
     authorize @task
     @task.assign_attributes(permitted_attributes(@task))
-    Tasks::Save.new(@task).call
+    Tasks::Update.new(@task).call
     render json: TaskSerializer.new(@task).serializable_hash
   end
 
