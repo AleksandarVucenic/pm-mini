@@ -503,6 +503,57 @@
               ]
             }
           }
+        },
+        {
+          "name": "Paginate users, per_page=1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Returns exactly 1 user', () => pm.expect(body.data.length).to.eql(1));",
+                  "pm.test('Meta reflects pagination state', () => {",
+                  "  pm.expect(body.meta.current_page).to.eql(1);",
+                  "  pm.expect(body.meta.page_size).to.eql(1);",
+                  "  pm.expect(body.meta.total_count).to.be.at.least(7);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{spock_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users?per_page=1&page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "1"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          }
         }
       ]
     },
