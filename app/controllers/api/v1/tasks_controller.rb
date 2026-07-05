@@ -21,11 +21,8 @@ class Api::V1::TasksController < Api::V1::BaseController
 
   def update
     authorize @task
-
-    permitted = pm_of_task?(@task) ? task_params : assignee_task_params
-    @task.assign_attributes(permitted)
+    @task.assign_attributes(permitted_attributes(@task))
     Tasks::LockedSave.new(@task).call
-
     render json: TaskSerializer.new(@task).serializable_hash
   end
 
@@ -38,18 +35,10 @@ class Api::V1::TasksController < Api::V1::BaseController
   private
 
   def set_task
-    @task = Task.find(params[:id])
-  end
-
-  def pm_of_task?(task)
-    task.project.pm_id == current_user.id
+    @task = Task.includes(:project).find(params[:id])
   end
 
   def task_params
     params.require(:task).permit(:title, :description, :status, :project_id, :assignee_id)
-  end
-
-  def assignee_task_params
-    params.require(:task).permit(:title, :description, :status)
   end
 end

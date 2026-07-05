@@ -10,6 +10,41 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     { "Authorization" => response.headers["Authorization"] }
   end
 
+  describe "GET /api/v1/tasks/:id" do
+    it "returns the task to the PM" do
+      task = Task.create!(title: "Warp core", project: project)
+
+      get "/api/v1/tasks/#{task.id}", headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body)
+      expect(json["data"]["attributes"]["title"]).to eq("Warp core")
+    end
+
+    it "returns the task to its assignee" do
+      task = Task.create!(title: "My task", project: project, assignee: spock)
+
+      get "/api/v1/tasks/#{task.id}", headers: auth_headers(spock)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns 404 for a non-existent task" do
+      get "/api/v1/tasks/999999", headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "forbids a user with no relation to the task" do
+      other = User.create!(name: "McCoy", email: "mccoy_show@test.com", password: "123456789")
+      task = Task.create!(title: "Not yours", project: project)
+
+      get "/api/v1/tasks/#{task.id}", headers: auth_headers(other)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   describe "GET /api/v1/tasks" do
     it "returns all tasks ordered by updated_at descending" do
       Task.create!(title: "Old", project: project, updated_at: 3.days.ago)
@@ -43,6 +78,38 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       json = JSON.parse(response.body)
       expect(json["data"].size).to eq(1)
       expect(json["data"].first["attributes"]["title"]).to eq("In Enterprise")
+    end
+
+    it "searches tasks by term matching task title" do
+      Task.create!(title: "Fix warp core", project: project)
+      Task.create!(title: "Calibrate shields", project: project)
+
+      get "/api/v1/tasks?term=warp", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(1)
+      expect(json["data"].first["attributes"]["title"]).to eq("Fix warp core")
+    end
+
+    it "searches tasks by term matching project name" do
+      other_project = Project.create!(name: "Voyager Refit", pm: kirk)
+      Task.create!(title: "Navigation charts", project: other_project)
+      Task.create!(title: "Warp core", project: project)
+
+      get "/api/v1/tasks?term=voyager", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(1)
+      expect(json["data"].first["attributes"]["title"]).to eq("Navigation charts")
+    end
+
+    it "searches tasks case-insensitively" do
+      Task.create!(title: "Fix warp core", project: project)
+
+      get "/api/v1/tasks?term=WARP", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(1)
     end
   end
 
