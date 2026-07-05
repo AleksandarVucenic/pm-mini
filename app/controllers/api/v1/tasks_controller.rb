@@ -35,7 +35,7 @@ class Api::V1::TasksController < Api::V1::BaseController
   private
 
   def set_task
-    @task = Task.includes(:project).find(params[:id])
+    @task = Task.includes(:project, :assignee).find(params[:id])
   end
 
   def task_params
