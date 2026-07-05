@@ -23,6 +23,7 @@ class ErrorSerializer
     when 403 then "Forbidden"
     when 404 then "Not Found"
     when 422 then "Validation Error"
+    when 429 then "Too Many Requests"
     else "Error"
     end
   end
