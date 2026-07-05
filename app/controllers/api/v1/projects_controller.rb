@@ -3,9 +3,9 @@ class Api::V1::ProjectsController < Api::V1::BaseController
 
   def index
     filtered = ProjectSearchQuery.new(relation: policy_scope(Project), term: params[:term]).call
-    results = ProjectTaskCountsQuery.new(relation: filtered).call
-    pagy, paginated_results = paginate(results)
-    render json: ProjectSerializer.new(paginated_results, meta: pagination_meta(pagy)).serializable_hash
+    pagy, paginated_projects = paginate(filtered)
+    results = ProjectTaskCountsQuery.new(relation: paginated_projects).call
+    render json: ProjectSerializer.new(results, meta: pagination_meta(pagy)).serializable_hash
   end
 
   def show
