@@ -1069,15 +1069,15 @@
           }
         },
         {
-          "name": "[AUTH] Scotty (not the PM) tries to update Enterprise Refit \u2014 expect 403",
+          "name": "[AUTH] Scotty (not the PM) tries to update Enterprise Refit \u2014 expect 404",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
                   "const body = pm.response.json();",
-                  "pm.test('Error is JSON:API forbidden shape', () => pm.expect(body.errors[0].status).to.eql('403'));"
+                  "pm.test('Error is JSON:API not-found shape', () => pm.expect(body.errors[0].status).to.eql('404'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1149,13 +1149,13 @@
           }
         },
         {
-          "name": "[AUTH] Scotty (not the PM) tries to delete Enterprise Refit \u2014 expect 403",
+          "name": "[AUTH] Scotty (not the PM) tries to delete Enterprise Refit \u2014 expect 404",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
                 ],
                 "type": "text/javascript"
               }
@@ -1829,14 +1829,14 @@
           }
         },
         {
-          "name": "[AUTH] Assignee (Spock) tries to update a task NOT assigned to him \u2014 expect 403",
-          "description": "Task 3 (Restock sickbay) is assigned to McCoy, not Spock.",
+          "name": "[AUTH] Assignee (Spock) tries to update a task NOT assigned to him \u2014 expect 404",
+          "description": "Task 3 (Restock sickbay) is assigned to McCoy, not Spock. Because policy_scope filters tasks to those Spock manages or is assigned to, this task is invisible to him \u2014 returns 404, not 403, to prevent resource enumeration.",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
                 ],
                 "type": "text/javascript"
               }
@@ -1873,14 +1873,14 @@
           }
         },
         {
-          "name": "[AUTH] An unrelated user (Scotty \u2014 not PM, not assignee on this Enterprise Refit task) tries to update it \u2014 expect 403",
-          "description": "Scotty is PM of Voyager Refit only \u2014 he has no PM or assignee relationship to this task, which belongs to Enterprise Refit.",
+          "name": "[AUTH] An unrelated user (Scotty \u2014 not PM, not assignee on this Enterprise Refit task) tries to update it \u2014 expect 404",
+          "description": "Scotty is PM of Voyager Refit only \u2014 he has no PM or assignee relationship to this task, which belongs to Enterprise Refit. policy_scope excludes it from his view entirely \u2014 returns 404 to prevent resource enumeration.",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
                 ],
                 "type": "text/javascript"
               }
