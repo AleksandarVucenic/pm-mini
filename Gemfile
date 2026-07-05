@@ -36,7 +36,6 @@ gem "image_processing", "~> 1.2"
 gem "rack-cors"
 
 gem "bcrypt", "~> 3.1.7"
-gem "jwt"
 gem "pundit"
 
 gem "devise"

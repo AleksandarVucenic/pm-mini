@@ -428,7 +428,6 @@ DEPENDENCIES
   faker
   image_processing (~> 1.2)
   jsonapi-serializer
-  jwt
   kamal
   mysql2 (~> 0.5)
   pagy
