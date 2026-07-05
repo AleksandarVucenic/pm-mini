@@ -19,6 +19,7 @@ class ErrorSerializer
 
   def self.title_for(numeric_status)
     case numeric_status
+    when 400 then "Bad Request"
     when 401 then "Unauthorized"
     when 403 then "Forbidden"
     when 404 then "Not Found"

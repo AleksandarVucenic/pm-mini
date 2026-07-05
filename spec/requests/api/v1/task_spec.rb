@@ -132,10 +132,10 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(json["data"]["attributes"]["assignee"]["id"]).to eq(spock.id)
     end
 
-    it "returns validation errors without a title" do
+    it "returns 400 when title is missing from the request" do
       post "/api/v1/tasks", params: { task: { project_id: project.id } }, headers: auth_headers(kirk)
 
-      expect(response).to have_http_status(:unprocessable_content)
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "returns validation errors when the assignee already has 5 open tasks in the project" do
