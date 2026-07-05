@@ -36,7 +36,7 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   private
 
   def set_project
-    @project = Project.find(params[:id])
+    @project = policy_scope(Project).find(params[:id])
   end
 
   def project_create_params
