@@ -35,13 +35,13 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "forbids a user with no relation to the task" do
+    it "returns 404 for a task outside the user's scope" do
       other = User.create!(name: "McCoy", email: "mccoy_show@test.com", password: "123456789")
       task = Task.create!(title: "Not yours", project: project)
 
       get "/api/v1/tasks/#{task.id}", headers: auth_headers(other)
 
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:not_found)
     end
   end
 
@@ -210,20 +210,20 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(task.reload.status).to eq("closed")
     end
 
-    it "forbids updating a task assigned to someone else" do
+    it "returns 404 when updating a task outside the user's scope" do
       task = Task.create!(title: "Not yours", project: project, assignee: mccoy)
 
       patch "/api/v1/tasks/#{task.id}", params: { task: { status: "closed" } }, headers: auth_headers(spock)
 
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:not_found)
     end
 
-    it "forbids a non-pm from deleting a task" do
+    it "returns 404 when a non-pm attempts to delete a task outside their scope" do
       task = Task.create!(title: "Protected", project: project)
 
       delete "/api/v1/tasks/#{task.id}", headers: auth_headers(spock)
 
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:not_found)
     end
 
     it "allows the assignee to update title/description/status, but NOT project_id or assignee_id" do
