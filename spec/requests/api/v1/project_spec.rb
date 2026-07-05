@@ -59,9 +59,14 @@ RSpec.describe "Api::V1::Projects", type: :request do
       expect(json["data"]["attributes"]["pm"]["id"]).to eq(kirk.id)
     end
 
-    it "returns validation errors without a name" do
+    it "returns 400 when name is missing from the request" do
+      post "/api/v1/projects", params: { project: {} }, headers: auth_headers(kirk)
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it "returns 400 when name is blank" do
       post "/api/v1/projects", params: { project: { name: "" } }, headers: auth_headers(kirk)
-      expect(response).to have_http_status(:unprocessable_content)
+      expect(response).to have_http_status(:bad_request)
     end
   end
 

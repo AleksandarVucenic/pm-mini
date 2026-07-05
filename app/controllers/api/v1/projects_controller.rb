@@ -15,7 +15,7 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   end
 
   def create
-    project = current_user.managed_projects.build(project_params)
+    project = current_user.managed_projects.build(project_create_params)
     authorize project
     project.save!
     render json: ProjectSerializer.new(project).serializable_hash, status: :created
@@ -23,7 +23,7 @@ class Api::V1::ProjectsController < Api::V1::BaseController
 
   def update
     authorize @project
-    @project.update!(project_params)
+    @project.update!(project_update_params)
     render json: ProjectSerializer.new(@project).serializable_hash
   end
 
@@ -39,7 +39,11 @@ class Api::V1::ProjectsController < Api::V1::BaseController
     @project = Project.find(params[:id])
   end
 
-  def project_params
+  def project_create_params
+    params.require(:project).tap { |p| p.require(:name) }.permit(:name)
+  end
+
+  def project_update_params
     params.require(:project).permit(:name)
   end
 end
