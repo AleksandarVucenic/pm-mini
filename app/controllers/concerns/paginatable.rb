@@ -8,7 +8,8 @@ module Paginatable
   private
 
   def paginate(scope)
-    pagy(:offset, scope, limit: (params[:per_page] || 20).to_i)
+    limit = (params[:per_page] || 20).to_i.clamp(1, 100)
+    pagy(:offset, scope, limit: limit)
   end
 
   def pagination_meta(pagy)
