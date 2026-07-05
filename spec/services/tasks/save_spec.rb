@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Tasks::LockedSave do
+RSpec.describe Tasks::Save do
   let(:pm) { User.create!(name: "Kirk", email: "kirk_ls@test.com", password: "12345678") }
   let(:assignee) { User.create!(name: "Spock", email: "spock_ls@test.com", password: "12345678") }
   let(:project) { Project.create!(name: "Enterprise Refit", pm: pm) }
@@ -69,6 +69,40 @@ RSpec.describe Tasks::LockedSave do
         described_class.new(sixth).call rescue ActiveRecord::RecordInvalid
 
         expect(Task.where(project: project, assignee: assignee, status: :open).count).to eq(5)
+      end
+
+      it "allows the 6th task if it is closed" do
+        sixth = Task.new(title: "Closed task", project: project, assignee: assignee, status: :closed)
+
+        expect { described_class.new(sixth).call }.not_to raise_error
+      end
+
+      it "allows a 6th open task in a different project" do
+        other_project = Project.create!(name: "Voyager Refit", pm: pm)
+        task = Task.new(title: "Other project task", project: other_project, assignee: assignee, status: :open)
+
+        expect { described_class.new(task).call }.not_to raise_error
+      end
+
+      it "allows a 6th open task for a different assignee" do
+        other = User.create!(name: "McCoy", email: "mccoy_ls2@test.com", password: "12345678")
+        task = Task.new(title: "Other assignee task", project: project, assignee: other, status: :open)
+
+        expect { described_class.new(task).call }.not_to raise_error
+      end
+
+      it "does not count the task against itself when updating" do
+        existing = Task.where(project: project, assignee: assignee, status: :open).first
+        existing.title = "Updated title"
+
+        expect { described_class.new(existing).call }.not_to raise_error
+      end
+
+      it "rejects reassigning an open task that would exceed the limit" do
+        unassigned = Task.create!(title: "Unassigned task", project: project, status: :open)
+        unassigned.assign_attributes(assignee: assignee)
+
+        expect { described_class.new(unassigned).call }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it "acquires a lock on the project before saving" do
