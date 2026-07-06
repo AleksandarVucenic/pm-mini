@@ -5,7 +5,7 @@ class TaskQuery
   end
 
   def call
-    scope = relation.includes(:project, :assignee).order(updated_at: :desc)
+    scope = relation.includes(project: :pm, assignee: []).order(updated_at: :desc)
     scope = filter_by_status(scope)
     scope = filter_by_project(scope)
     scope = filter_by_term(scope)

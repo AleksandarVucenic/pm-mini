@@ -1240,8 +1240,13 @@
               "script": {
                 "exec": [
                   "const body = pm.response.json();",
+                  "const getAssigneeEmail = (task) => {",
+                  "  const rel = task.relationships.assignee.data;",
+                  "  if (!rel) return null;",
+                  "  return body.included.find(i => i.type === 'user' && i.id === rel.id).attributes.email;",
+                  "};",
                   "pm.test('Every returned task is assigned to Spock', () => {",
-                  "  body.data.forEach(t => pm.expect(t.attributes.assignee.email).to.eql('spock@enterprise.com'));",
+                  "  body.data.forEach(t => pm.expect(getAssigneeEmail(t)).to.eql('spock@enterprise.com'));",
                   "});",
                   "pm.test('Spock does NOT see the unassigned task or McCoy\\'s task', () => {",
                   "  const titles = body.data.map(t => t.attributes.title);",
@@ -1283,14 +1288,23 @@
               "script": {
                 "exec": [
                   "const body = pm.response.json();",
-                  "const projectNames = body.data.map(t => t.attributes.project.name);",
+                  "const getProjectName = (task) => {",
+                  "  const id = task.relationships.project.data.id;",
+                  "  return body.included.find(i => i.type === 'project' && i.id === id).attributes.name;",
+                  "};",
+                  "const getAssigneeEmail = (task) => {",
+                  "  const rel = task.relationships.assignee.data;",
+                  "  if (!rel) return null;",
+                  "  return body.included.find(i => i.type === 'user' && i.id === rel.id).attributes.email;",
+                  "};",
                   "pm.test('Sees all Enterprise Refit tasks (he is PM there)', () => {",
-                  "  pm.expect(projectNames.filter(n => n === 'Enterprise Refit').length).to.eql(4);",
+                  "  const count = body.data.filter(t => getProjectName(t) === 'Enterprise Refit').length;",
+                  "  pm.expect(count).to.eql(4);",
                   "});",
                   "pm.test('Sees exactly his OWN assigned task in Voyager Refit, not Uhura\\'s', () => {",
-                  "  const voyagerTasks = body.data.filter(t => t.attributes.project.name === 'Voyager Refit');",
+                  "  const voyagerTasks = body.data.filter(t => getProjectName(t) === 'Voyager Refit');",
                   "  pm.expect(voyagerTasks.length).to.eql(1);",
-                  "  pm.expect(voyagerTasks[0].attributes.assignee.email).to.eql('kirk@enterprise.com');",
+                  "  pm.expect(getAssigneeEmail(voyagerTasks[0])).to.eql('kirk@enterprise.com');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1504,7 +1518,11 @@
                   "const body = pm.response.json();",
                   "pm.test('Returns tasks belonging to Voyager Refit even though the term doesn\\'t match any task title', () => {",
                   "  pm.expect(body.data.length).to.be.at.least(1);",
-                  "  body.data.forEach(t => pm.expect(t.attributes.project.name).to.eql('Voyager Refit'));",
+                  "  body.data.forEach(t => {",
+                  "    const projectId = t.relationships.project.data.id;",
+                  "    const project = body.included.find(i => i.type === 'project' && i.id === projectId);",
+                  "    pm.expect(project.attributes.name).to.eql('Voyager Refit');",
+                  "  });",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1620,7 +1638,7 @@
                   "pm.collectionVariables.set('created_task_id', body.data.id);",
                   "pm.test('Defaults to open status, no assignee', () => {",
                   "  pm.expect(body.data.attributes.status).to.eql('open');",
-                  "  pm.expect(body.data.attributes.assignee).to.be.null;",
+                  "  pm.expect(body.data.relationships.assignee.data).to.be.null;",
                   "});"
                 ],
                 "type": "text/javascript"

@@ -3,11 +3,6 @@ class TaskSerializer
 
   attributes :title, :description, :status, :updated_at
 
-  attribute :project do |task|
-    { id: task.project.id, name: task.project.name }
-  end
-
-  attribute :assignee do |task|
-    task.assignee ? UserSerializer.embedded(task.assignee) : nil
-  end
+  belongs_to :project, serializer: ProjectEmbedSerializer
+  belongs_to :assignee, serializer: UserSerializer
 end

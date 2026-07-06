@@ -4,26 +4,27 @@ class Api::V1::TasksController < Api::V1::BaseController
   def index
     tasks = TaskQuery.new(relation: policy_scope(Task), params: params).call
     pagy, paginated = paginate(tasks)
-    render json: TaskSerializer.new(paginated, meta: pagination_meta(pagy)).serializable_hash
+    render json: TaskSerializer.new(paginated, meta: pagination_meta(pagy), include: [:project, :assignee]).serializable_hash
   end
 
   def show
     authorize @task
-    render json: TaskSerializer.new(@task).serializable_hash
+    render json: TaskSerializer.new(@task, include: [:project, :assignee]).serializable_hash
   end
 
   def create
     task = Task.new(task_params)
     authorize task
     Tasks::Create.new(task).call
-    render json: TaskSerializer.new(Task.includes(:project, :assignee).find(task.id)).serializable_hash, status: :created
+    task = Task.includes(project: :pm, assignee: []).find(task.id)
+    render json: TaskSerializer.new(task, include: [:project, :assignee]).serializable_hash, status: :created
   end
 
   def update
     authorize @task
     @task.assign_attributes(permitted_attributes(@task))
     Tasks::Update.new(@task).call
-    render json: TaskSerializer.new(Task.includes(:project, :assignee).find(@task.id)).serializable_hash
+    render json: TaskSerializer.new(Task.includes(project: :pm, assignee: []).find(@task.id), include: [:project, :assignee]).serializable_hash
   end
 
   def destroy
@@ -35,7 +36,7 @@ class Api::V1::TasksController < Api::V1::BaseController
   private
 
   def set_task
-    @task = policy_scope(Task).includes(:project, :assignee).find(params[:id])
+    @task = policy_scope(Task).includes(project: :pm, assignee: []).find(params[:id])
   end
 
   def task_params
