@@ -1,8 +1,9 @@
 class ProjectTaskCountsQuery
   Result = Struct.new(:project, :open_tasks_count, :closed_tasks_count) do
-    def id
-      project.id
-    end
+    def id = project.id
+    def name = project.name
+    def pm = project.pm
+    def pm_id = project.pm_id
   end
 
   def self.for_project(project)

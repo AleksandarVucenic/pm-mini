@@ -47,7 +47,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
       expect(json["data"]["attributes"]["name"]).to eq("Enterprise Refit")
-      expect(json["data"]["attributes"]["pm"]["id"]).to eq(kirk.id)
+      expect(json["data"]["relationships"]["pm"]["data"]["id"]).to eq(kirk.id.to_s)
     end
 
     it "ignores a pm_id sent in the request body" do
@@ -56,7 +56,7 @@ RSpec.describe "Api::V1::Projects", type: :request do
            headers: auth_headers(kirk)
 
       json = JSON.parse(response.body)
-      expect(json["data"]["attributes"]["pm"]["id"]).to eq(kirk.id)
+      expect(json["data"]["relationships"]["pm"]["data"]["id"]).to eq(kirk.id.to_s)
     end
 
     it "returns 400 when name is missing from the request" do
