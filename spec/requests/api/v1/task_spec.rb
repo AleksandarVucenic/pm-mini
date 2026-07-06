@@ -135,7 +135,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
            headers: auth_headers(kirk)
 
       json = JSON.parse(response.body)
-      expect(json["data"]["attributes"]["assignee"]["id"]).to eq(spock.id)
+      expect(json["data"]["relationships"]["assignee"]["data"]["id"]).to eq(spock.id.to_s)
     end
 
     it "returns 400 when title is missing from the request" do
