@@ -10,11 +10,11 @@ class ProjectSerializer
   end
 
   attribute :open_tasks_count do |object|
-    object.respond_to?(:open_tasks_count) ? object.open_tasks_count.to_i : project_for(object).tasks.open.count
+    object.open_tasks_count.to_i
   end
 
   attribute :closed_tasks_count do |object|
-    object.respond_to?(:closed_tasks_count) ? object.closed_tasks_count.to_i : project_for(object).tasks.closed.count
+    object.closed_tasks_count.to_i
   end
 
   def self.project_for(object)

@@ -22,6 +22,10 @@ class Api::V1::BaseController < ApplicationController
     render json: ErrorSerializer.from_message(e.message, status: :bad_request), status: :bad_request
   end
 
+  rescue_from ArgumentError do |e|
+    render json: ErrorSerializer.from_message(e.message, status: :bad_request), status: :bad_request
+  end
+
   rescue_from Pundit::NotAuthorizedError do
     render json: ErrorSerializer.from_message("You are not authorized to perform this action", status: :forbidden), status: :forbidden
   end

@@ -68,6 +68,12 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(json["data"].first["attributes"]["title"]).to eq("Open task")
     end
 
+    it "returns 400 for an invalid status filter" do
+      get "/api/v1/tasks?status=invalid", headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:bad_request)
+    end
+
     it "filters by project_id" do
       other_project = Project.create!(name: "Voyager Refit", pm: kirk)
       Task.create!(title: "In Enterprise", project: project)

@@ -1409,6 +1409,49 @@
           }
         },
         {
+          "name": "Filter tasks by status=invalid — expect 400",
+          "description": "Rails 8 silently ignores unknown enum values at the query level — the validation is explicit in TaskQuery before the query runs.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error is JSON:API bad-request shape', () => pm.expect(body.errors[0].status).to.eql('400'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks?status=invalid",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "invalid"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Search tasks by term matching TASK TITLE ('warp')",
           "event": [
             {

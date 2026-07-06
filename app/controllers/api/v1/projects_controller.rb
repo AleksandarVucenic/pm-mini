@@ -10,21 +10,21 @@ class Api::V1::ProjectsController < Api::V1::BaseController
 
   def show
     authorize @project
-    result = ProjectTaskCountsQuery.new(relation: Project.where(id: @project.id)).call.first
-    render json: ProjectSerializer.new(result).serializable_hash
+    render json: ProjectSerializer.new(ProjectTaskCountsQuery.for_project(@project)).serializable_hash
   end
 
   def create
     project = current_user.managed_projects.build(project_create_params)
+    project.pm = current_user
     authorize project
     project.save!
-    render json: ProjectSerializer.new(project).serializable_hash, status: :created
+    render json: ProjectSerializer.new(ProjectTaskCountsQuery.for_project(project)).serializable_hash, status: :created
   end
 
   def update
     authorize @project
     @project.update!(project_update_params)
-    render json: ProjectSerializer.new(@project).serializable_hash
+    render json: ProjectSerializer.new(ProjectTaskCountsQuery.for_project(@project)).serializable_hash
   end
 
   def destroy
@@ -36,7 +36,7 @@ class Api::V1::ProjectsController < Api::V1::BaseController
   private
 
   def set_project
-    @project = policy_scope(Project).find(params[:id])
+    @project = policy_scope(Project).includes(:pm).find(params[:id])
   end
 
   def project_create_params

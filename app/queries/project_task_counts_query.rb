@@ -5,6 +5,12 @@ class ProjectTaskCountsQuery
     end
   end
 
+  def self.for_project(project)
+    open_count = Task.where(project_id: project.id, status: :open).count
+    closed_count = Task.where(project_id: project.id, status: :closed).count
+    Result.new(project, open_count, closed_count)
+  end
+
   def initialize(relation: Project.all)
     @relation = relation
   end

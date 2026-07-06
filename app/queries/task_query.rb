@@ -18,6 +18,7 @@ class TaskQuery
 
   def filter_by_status(scope)
     return scope unless params[:status].present?
+    raise ArgumentError, "'#{params[:status]}' is not a valid status" unless Task.statuses.key?(params[:status])
 
     scope.where(status: params[:status])
   end
