@@ -1,0 +1,1 @@
+class InvalidFilterError < ArgumentError; end

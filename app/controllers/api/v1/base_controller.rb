@@ -22,7 +22,7 @@ class Api::V1::BaseController < ApplicationController
     render json: ErrorSerializer.from_message(e.message, status: :bad_request), status: :bad_request
   end
 
-  rescue_from ArgumentError do |e|
+  rescue_from InvalidFilterError do |e|
     render json: ErrorSerializer.from_message(e.message, status: :bad_request), status: :bad_request
   end
 
