@@ -41,6 +41,6 @@ class Api::V1::TasksController < Api::V1::BaseController
 
   def task_params
     params.require(:task).tap { |p| p.require([ :title, :project_id ]) }
-          .permit(:title, :description, :status, :project_id, :assignee_id)
+          .permit(:title, :description, :closed, :project_id, :assignee_id)
   end
 end

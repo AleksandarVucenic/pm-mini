@@ -6,8 +6,8 @@ class ProjectTaskCountsQuery
   end
 
   def self.for_project(project)
-    counts = Task.where(project_id: project.id).group(:status).count
-    Result.new(project, counts["open"] || 0, counts["closed"] || 0)
+    counts = Task.where(project_id: project.id).group(:closed).count
+    Result.new(project, counts[false] || 0, counts[true] || 0)
   end
 
   def initialize(relation: Project.all)
@@ -18,8 +18,8 @@ class ProjectTaskCountsQuery
     projects = relation.includes(:pm).to_a
     project_ids = projects.map(&:id)
 
-    open_counts = Task.where(project_id: project_ids, status: :open).group(:project_id).count
-    closed_counts = Task.where(project_id: project_ids, status: :closed).group(:project_id).count
+    open_counts = Task.where(project_id: project_ids, closed: false).group(:project_id).count
+    closed_counts = Task.where(project_id: project_ids, closed: true).group(:project_id).count
 
     projects.map do |project|
       Result.new(project, open_counts[project.id] || 0, closed_counts[project.id] || 0)

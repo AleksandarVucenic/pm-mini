@@ -6,18 +6,23 @@ RSpec.describe TaskQuery do
   let(:project_b) { Project.create!(name: "Voyager Refit", pm: pm) }
 
   before do
-    Task.create!(title: "Fix warp core", project: project_a, status: :open)
-    Task.create!(title: "Repair shields", project: project_a, status: :closed)
-    Task.create!(title: "Calibrate sensors", project: project_b, status: :open)
+    Task.create!(title: "Fix warp core", project: project_a)
+    Task.create!(title: "Repair shields", project: project_a, closed: true)
+    Task.create!(title: "Calibrate sensors", project: project_b)
   end
 
   it "returns all tasks with no filters" do
     expect(described_class.new(params: {}).call.count).to eq(3)
   end
 
-  it "filters by status" do
-    result = described_class.new(params: { status: "open" }).call
+  it "filters by closed=false (open tasks)" do
+    result = described_class.new(params: { closed: "false" }).call
     expect(result.count).to eq(2)
+  end
+
+  it "filters by closed=true (closed tasks)" do
+    result = described_class.new(params: { closed: "true" }).call
+    expect(result.count).to eq(1)
   end
 
   it "filters by project_id" do
@@ -43,7 +48,7 @@ RSpec.describe TaskQuery do
   end
 
   it "combines multiple filters" do
-    result = described_class.new(params: { status: "open", project_id: project_a.id }).call
+    result = described_class.new(params: { closed: "false", project_id: project_a.id }).call
     expect(result.count).to eq(1)
     expect(result.first.title).to eq("Fix warp core")
   end
@@ -54,9 +59,9 @@ RSpec.describe TaskQuery do
     expect(result.count).to eq(2)
   end
 
-  it "raises InvalidFilterError for an unknown status value" do
+  it "raises InvalidFilterError for an unknown closed value" do
     expect {
-      described_class.new(params: { status: "pending" }).call
-    }.to raise_error(InvalidFilterError, /'pending' is not a valid status/)
+      described_class.new(params: { closed: "maybe" }).call
+    }.to raise_error(InvalidFilterError, /'maybe' is not a valid value for closed/)
   end
 end

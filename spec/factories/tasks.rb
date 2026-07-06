@@ -2,11 +2,11 @@ FactoryBot.define do
   factory :task do
     title { "Fix warp core" }
     description { "A routine repair task" }
-    status { :open }
+    closed { false }
     project
 
     trait :closed do
-      status { :closed }
+      closed { true }
     end
 
     trait :with_assignee do

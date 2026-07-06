@@ -23,21 +23,21 @@ enterprise = Project.find_or_create_by!(name: "Enterprise Refit") { |p| p.pm = k
 Task.find_or_create_by!(title: "Repair warp core", project: enterprise) do |t|
   t.description = "Warp core is running at 60% efficiency"
   t.assignee = spock
-  t.status = :open
+  t.closed = false
 end
 
 Task.find_or_create_by!(title: "Calibrate shields", project: enterprise) do |t|
   t.assignee = spock
-  t.status = :closed
+  t.closed = true
 end
 
 Task.find_or_create_by!(title: "Restock sickbay", project: enterprise) do |t|
   t.assignee = mccoy
-  t.status = :open
+  t.closed = false
 end
 
 Task.find_or_create_by!(title: "Unassigned maintenance task", project: enterprise) do |t|
-  t.status = :open
+  t.closed = false
 end
 
 # Scotty is PM on "Voyager Refit" — Kirk is assignee, not PM
@@ -45,12 +45,12 @@ voyager = Project.find_or_create_by!(name: "Voyager Refit") { |p| p.pm = scotty 
 
 Task.find_or_create_by!(title: "Fix transporter buffer", project: voyager) do |t|
   t.assignee = kirk
-  t.status = :open
+  t.closed = false
 end
 
 Task.find_or_create_by!(title: "Update navigation charts", project: voyager) do |t|
   t.assignee = uhura
-  t.status = :open
+  t.closed = false
 end
 
 puts "Seeded #{User.count} users, #{Project.count} projects, #{Task.count} tasks."

@@ -57,19 +57,19 @@ RSpec.describe "Api::V1::Tasks", type: :request do
       expect(titles).to eq([ "New", "Old" ])
     end
 
-    it "filters by status" do
-      Task.create!(title: "Open task", project: project, status: :open)
-      Task.create!(title: "Closed task", project: project, status: :closed)
+    it "filters by closed=false (open tasks)" do
+      Task.create!(title: "Open task", project: project)
+      Task.create!(title: "Closed task", project: project, closed: true)
 
-      get "/api/v1/tasks?status=open", headers: auth_headers(kirk)
+      get "/api/v1/tasks?closed=false", headers: auth_headers(kirk)
 
       json = JSON.parse(response.body)
       expect(json["data"].size).to eq(1)
       expect(json["data"].first["attributes"]["title"]).to eq("Open task")
     end
 
-    it "returns 400 for an invalid status filter" do
-      get "/api/v1/tasks?status=invalid", headers: auth_headers(kirk)
+    it "returns 400 for an invalid closed filter" do
+      get "/api/v1/tasks?closed=invalid", headers: auth_headers(kirk)
 
       expect(response).to have_http_status(:bad_request)
     end
@@ -145,10 +145,10 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     end
 
     it "returns validation errors when the assignee already has 5 open tasks in the project" do
-      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: spock, status: :open) }
+      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: spock) }
 
       post "/api/v1/tasks",
-           params: { task: { title: "One too many", project_id: project.id, assignee_id: spock.id, status: "open" } },
+           params: { task: { title: "One too many", project_id: project.id, assignee_id: spock.id } },
            headers: auth_headers(kirk)
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -233,16 +233,16 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     it "allows the assignee to update their own task" do
       task = Task.create!(title: "My task", project: project, assignee: spock)
 
-      patch "/api/v1/tasks/#{task.id}", params: { task: { status: "closed" } }, headers: auth_headers(spock)
+      patch "/api/v1/tasks/#{task.id}", params: { task: { closed: true } }, headers: auth_headers(spock)
 
       expect(response).to have_http_status(:ok)
-      expect(task.reload.status).to eq("closed")
+      expect(task.reload.closed).to be true
     end
 
     it "returns 404 when updating a task outside the user's scope" do
       task = Task.create!(title: "Not yours", project: project, assignee: mccoy)
 
-      patch "/api/v1/tasks/#{task.id}", params: { task: { status: "closed" } }, headers: auth_headers(spock)
+      patch "/api/v1/tasks/#{task.id}", params: { task: { closed: true } }, headers: auth_headers(spock)
 
       expect(response).to have_http_status(:not_found)
     end

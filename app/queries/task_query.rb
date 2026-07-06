@@ -6,7 +6,7 @@ class TaskQuery
 
   def call
     scope = relation.includes(project: :pm, assignee: []).order(updated_at: :desc)
-    scope = filter_by_status(scope)
+    scope = filter_by_closed(scope)
     scope = filter_by_project(scope)
     scope = filter_by_term(scope)
     scope
@@ -16,11 +16,11 @@ class TaskQuery
 
   attr_reader :relation, :params
 
-  def filter_by_status(scope)
-    return scope unless params[:status].present?
-    raise InvalidFilterError, "'#{params[:status]}' is not a valid status" unless Task.statuses.key?(params[:status])
+  def filter_by_closed(scope)
+    return scope unless params[:closed].present?
+    raise InvalidFilterError, "'#{params[:closed]}' is not a valid value for closed" unless %w[true false].include?(params[:closed])
 
-    scope.where(status: params[:status])
+    scope.where(closed: params[:closed] == "true")
   end
 
   def filter_by_project(scope)

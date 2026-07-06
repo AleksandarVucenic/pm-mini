@@ -982,15 +982,15 @@
           }
         },
         {
-          "name": "Create a project without a name \u2014 expect 422",
+          "name": "Create a project without a name \u2014 expect 400",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
                   "const body = pm.response.json();",
-                  "pm.test('Error follows JSON:API error shape', () => pm.expect(body.errors[0].status).to.eql('422'));"
+                  "pm.test('Error follows JSON:API error shape', () => pm.expect(body.errors[0].status).to.eql('400'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1069,15 +1069,15 @@
           }
         },
         {
-          "name": "[AUTH] Scotty (not the PM) tries to update Enterprise Refit \u2014 expect 404",
+          "name": "[AUTH] Scotty (not the PM) tries to update Enterprise Refit \u2014 expect 403",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));",
                   "const body = pm.response.json();",
-                  "pm.test('Error is JSON:API not-found shape', () => pm.expect(body.errors[0].status).to.eql('404'));"
+                  "pm.test('Error is JSON:API forbidden shape', () => pm.expect(body.errors[0].status).to.eql('403'));"
                 ],
                 "type": "text/javascript"
               }
@@ -1149,13 +1149,13 @@
           }
         },
         {
-          "name": "[AUTH] Scotty (not the PM) tries to delete Enterprise Refit \u2014 expect 404",
+          "name": "[AUTH] Scotty (not the PM) tries to delete Enterprise Refit \u2014 expect 403",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+                  "pm.test('Status is 403', () => pm.response.to.have.status(403));"
                 ],
                 "type": "text/javascript"
               }
@@ -1333,14 +1333,14 @@
           }
         },
         {
-          "name": "Filter tasks by status=open",
+          "name": "Filter tasks by closed=false",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "const body = pm.response.json();",
-                  "pm.test('All returned tasks are open', () => body.data.forEach(t => pm.expect(t.attributes.status).to.eql('open')));"
+                  "pm.test('All returned tasks are open (closed=false)', () => body.data.forEach(t => pm.expect(t.attributes.closed).to.eql(false)));"
                 ],
                 "type": "text/javascript"
               }
@@ -1355,7 +1355,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/v1/tasks?project_id=1&status=open",
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1&closed=false",
               "host": [
                 "{{base_url}}"
               ],
@@ -1370,22 +1370,22 @@
                   "value": "1"
                 },
                 {
-                  "key": "status",
-                  "value": "open"
+                  "key": "closed",
+                  "value": "false"
                 }
               ]
             }
           }
         },
         {
-          "name": "Filter tasks by status=closed",
+          "name": "Filter tasks by closed=true",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "const body = pm.response.json();",
-                  "pm.test('All returned tasks are closed', () => body.data.forEach(t => pm.expect(t.attributes.status).to.eql('closed')));"
+                  "pm.test('All returned tasks are closed (closed=true)', () => body.data.forEach(t => pm.expect(t.attributes.closed).to.eql(true)));"
                 ],
                 "type": "text/javascript"
               }
@@ -1400,7 +1400,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/v1/tasks?project_id=1&status=closed",
+              "raw": "{{base_url}}/api/v1/tasks?project_id=1&closed=true",
               "host": [
                 "{{base_url}}"
               ],
@@ -1415,16 +1415,16 @@
                   "value": "1"
                 },
                 {
-                  "key": "status",
-                  "value": "closed"
+                  "key": "closed",
+                  "value": "true"
                 }
               ]
             }
           }
         },
         {
-          "name": "Filter tasks by status=invalid — expect 400",
-          "description": "Rails 8 silently ignores unknown enum values at the query level — the validation is explicit in TaskQuery before the query runs.",
+          "name": "Filter tasks by closed=invalid — expect 400",
+          "description": "TaskQuery validates that the closed param is 'true' or 'false' — any other value raises InvalidFilterError and returns 400.",
           "event": [
             {
               "listen": "test",
@@ -1447,7 +1447,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/v1/tasks?status=invalid",
+              "raw": "{{base_url}}/api/v1/tasks?closed=invalid",
               "host": [
                 "{{base_url}}"
               ],
@@ -1458,7 +1458,7 @@
               ],
               "query": [
                 {
-                  "key": "status",
+                  "key": "closed",
                   "value": "invalid"
                 }
               ]
@@ -1636,8 +1636,8 @@
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "const body = pm.response.json();",
                   "pm.collectionVariables.set('created_task_id', body.data.id);",
-                  "pm.test('Defaults to open status, no assignee', () => {",
-                  "  pm.expect(body.data.attributes.status).to.eql('open');",
+                  "pm.test('Defaults to closed=false, no assignee', () => {",
+                  "  pm.expect(body.data.attributes.closed).to.eql(false);",
                   "  pm.expect(body.data.relationships.assignee.data).to.be.null;",
                   "});"
                 ],
@@ -1760,13 +1760,13 @@
           }
         },
         {
-          "name": "Task without a title \u2014 expect 422",
+          "name": "Task without a title \u2014 expect 400",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status is 422', () => pm.response.to.have.status(422));"
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));"
                 ],
                 "type": "text/javascript"
               }
@@ -1853,7 +1853,7 @@
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
-                  "pm.test('Status is now closed', () => pm.expect(body.data.attributes.status).to.eql('closed'));"
+                  "pm.test('closed is now true', () => pm.expect(body.data.attributes.closed).to.eql(true));"
                 ],
                 "type": "text/javascript"
               }
@@ -1885,7 +1885,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"closed\": true\n  }\n}"
             }
           }
         },
@@ -1929,7 +1929,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"closed\": true\n  }\n}"
             }
           }
         },
@@ -1973,7 +1973,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"status\": \"closed\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"closed\": true\n  }\n}"
             }
           }
         },
@@ -2090,7 +2090,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 1\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 1\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2132,7 +2132,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 2\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 2\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2174,7 +2174,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 3\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 3\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2216,7 +2216,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 4\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 4\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2258,7 +2258,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 5\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 5\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2304,7 +2304,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (one too many)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (one too many)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2388,7 +2388,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task in Voyager (different project, should be fine)\",\n    \"project_id\": 2,\n    \"assignee_id\": 6,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task in Voyager (different project, should be fine)\",\n    \"project_id\": 2,\n    \"assignee_id\": 6\n  }\n}"
             }
           }
         },
@@ -2430,7 +2430,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"McCoy task (different assignee, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 5,\n    \"status\": \"open\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"McCoy task (different assignee, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 5\n  }\n}"
             }
           }
         }

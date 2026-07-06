@@ -21,8 +21,8 @@ RSpec.describe Tasks::Create do
 
     it "enforces the 5-open-task limit" do
       assignee = User.create!(name: "Spock", email: "spock_create@test.com", password: "12345678")
-      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: assignee, status: :open) }
-      sixth = Task.new(title: "One too many", project: project, assignee: assignee, status: :open)
+      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: assignee) }
+      sixth = Task.new(title: "One too many", project: project, assignee: assignee)
 
       expect { described_class.new(sixth).call }.to raise_error(ActiveRecord::RecordInvalid)
     end

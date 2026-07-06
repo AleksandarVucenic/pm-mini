@@ -6,10 +6,10 @@ RSpec.describe ProjectTaskCountsQuery do
   let(:project_b) { Project.create!(name: "Project B", pm: pm) }
 
   before do
-    Task.create!(title: "Open 1", project: project_a, status: :open)
-    Task.create!(title: "Open 2", project: project_a, status: :open)
-    Task.create!(title: "Closed 1", project: project_a, status: :closed)
-    Task.create!(title: "Open in B", project: project_b, status: :open)
+    Task.create!(title: "Open 1", project: project_a)
+    Task.create!(title: "Open 2", project: project_a)
+    Task.create!(title: "Closed 1", project: project_a, closed: true)
+    Task.create!(title: "Open in B", project: project_b)
   end
 
   it "returns correct open and closed counts per project" do

@@ -2,17 +2,15 @@ class Task < ApplicationRecord
   belongs_to :project
   belongs_to :assignee, class_name: "User", optional: true
 
-  enum :status, { open: 0, closed: 1 }
-
   validates :title, presence: true, length: { maximum: 200 }
-  validate :assignee_open_task_limit, if: -> { assignee_id.present? && open? }
+  validate :assignee_open_task_limit, if: -> { assignee_id.present? && !closed? }
 
   private
 
   def assignee_open_task_limit
-    return unless will_save_change_to_assignee_id? || will_save_change_to_status?
+    return unless will_save_change_to_assignee_id? || will_save_change_to_closed?
 
-    count = Task.where(project_id: project_id, assignee_id: assignee_id, status: :open)
+    count = Task.where(project_id: project_id, assignee_id: assignee_id, closed: false)
                 .where.not(id: id)
                 .count
 

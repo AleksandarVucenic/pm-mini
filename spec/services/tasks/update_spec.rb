@@ -23,8 +23,8 @@ RSpec.describe Tasks::Update do
 
     it "enforces the 5-open-task limit on reassignment" do
       assignee = User.create!(name: "Spock", email: "spock_update@test.com", password: "12345678")
-      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: assignee, status: :open) }
-      task = Task.create!(title: "Unassigned", project: project, status: :open)
+      5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: assignee) }
+      task = Task.create!(title: "Unassigned", project: project)
       task.assign_attributes(assignee: assignee)
 
       expect { described_class.new(task).call }.to raise_error(ActiveRecord::RecordInvalid)
