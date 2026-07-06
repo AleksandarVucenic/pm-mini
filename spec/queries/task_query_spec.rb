@@ -53,4 +53,10 @@ RSpec.describe TaskQuery do
     result = described_class.new(relation: restricted, params: {}).call
     expect(result.count).to eq(2)
   end
+
+  it "raises InvalidFilterError for an unknown status value" do
+    expect {
+      described_class.new(params: { status: "pending" }).call
+    }.to raise_error(InvalidFilterError, /'pending' is not a valid status/)
+  end
 end

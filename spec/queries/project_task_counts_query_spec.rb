@@ -46,4 +46,27 @@ RSpec.describe ProjectTaskCountsQuery do
 
     expect(results.first.id).to eq(project_a.id)
   end
+
+  describe ".for_project" do
+    it "returns correct open and closed counts for a single project" do
+      result = described_class.for_project(project_a)
+
+      expect(result.open_tasks_count).to eq(2)
+      expect(result.closed_tasks_count).to eq(1)
+      expect(result.project).to eq(project_a)
+    end
+
+    it "returns zero counts for a project with no tasks" do
+      empty = Project.create!(name: "Empty", pm: pm)
+
+      result = described_class.for_project(empty)
+
+      expect(result.open_tasks_count).to eq(0)
+      expect(result.closed_tasks_count).to eq(0)
+    end
+
+    it "exposes an id method that returns the project's id" do
+      expect(described_class.for_project(project_a).id).to eq(project_a.id)
+    end
+  end
 end

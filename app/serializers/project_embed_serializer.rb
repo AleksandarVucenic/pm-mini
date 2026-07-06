@@ -5,7 +5,5 @@ class ProjectEmbedSerializer
 
   attributes :name
 
-  attribute :pm do |project|
-    UserSerializer.embedded(project.pm)
-  end
+  belongs_to :pm, serializer: UserSerializer
 end

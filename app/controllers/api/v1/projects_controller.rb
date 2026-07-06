@@ -15,7 +15,6 @@ class Api::V1::ProjectsController < Api::V1::BaseController
 
   def create
     project = current_user.managed_projects.build(project_create_params)
-    project.pm = current_user
     authorize project
     project.save!
     render json: ProjectSerializer.new(ProjectTaskCountsQuery.for_project(project)).serializable_hash, status: :created

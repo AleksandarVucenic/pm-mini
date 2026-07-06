@@ -177,6 +177,29 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     end
   end
 
+  describe "pagination" do
+    it "includes pagination meta in the response" do
+      3.times { |i| Task.create!(title: "Task #{i}", project: project) }
+
+      get "/api/v1/tasks?per_page=2", headers: auth_headers(kirk)
+
+      json = JSON.parse(response.body)
+      expect(json["data"].size).to eq(2)
+      expect(json["meta"]["current_page"]).to eq(1)
+      expect(json["meta"]["total_count"]).to eq(3)
+    end
+  end
+
+  describe "FK violation" do
+    it "returns 422 when assignee_id references a non-existent user" do
+      post "/api/v1/tasks",
+           params: { task: { title: "Ghost assignee", project_id: project.id, assignee_id: 999999 } },
+           headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
   describe "authorization" do
     let(:mccoy) { User.create!(name: "McCoy", email: "mccoy_t@test.com", password: "123456789") }
 

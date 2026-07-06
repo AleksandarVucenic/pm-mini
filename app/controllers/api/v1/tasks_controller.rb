@@ -4,12 +4,12 @@ class Api::V1::TasksController < Api::V1::BaseController
   def index
     tasks = TaskQuery.new(relation: policy_scope(Task), params: params).call
     pagy, paginated = paginate(tasks)
-    render json: TaskSerializer.new(paginated, meta: pagination_meta(pagy), include: [:project, :assignee]).serializable_hash
+    render json: TaskSerializer.new(paginated, meta: pagination_meta(pagy), include: ["project.pm", "assignee"]).serializable_hash
   end
 
   def show
     authorize @task
-    render json: TaskSerializer.new(@task, include: [:project, :assignee]).serializable_hash
+    render json: TaskSerializer.new(@task, include: ["project.pm", "assignee"]).serializable_hash
   end
 
   def create
@@ -17,14 +17,14 @@ class Api::V1::TasksController < Api::V1::BaseController
     authorize task
     Tasks::Create.new(task).call
     task = Task.includes(project: :pm, assignee: []).find(task.id)
-    render json: TaskSerializer.new(task, include: [:project, :assignee]).serializable_hash, status: :created
+    render json: TaskSerializer.new(task, include: ["project.pm", "assignee"]).serializable_hash, status: :created
   end
 
   def update
     authorize @task
     @task.assign_attributes(permitted_attributes(@task))
     Tasks::Update.new(@task).call
-    render json: TaskSerializer.new(Task.includes(project: :pm, assignee: []).find(@task.id), include: [:project, :assignee]).serializable_hash
+    render json: TaskSerializer.new(Task.includes(project: :pm, assignee: []).find(@task.id), include: ["project.pm", "assignee"]).serializable_hash
   end
 
   def destroy
