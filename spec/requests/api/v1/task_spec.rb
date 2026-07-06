@@ -148,6 +148,14 @@ RSpec.describe "Api::V1::Tasks", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "returns 403 (not 500) when project_id references a non-existent project" do
+      post "/api/v1/tasks",
+           params: { task: { title: "Orphan task", project_id: 999999 } },
+           headers: auth_headers(kirk)
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe "PATCH /api/v1/tasks/:id" do

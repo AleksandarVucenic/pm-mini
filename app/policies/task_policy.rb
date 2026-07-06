@@ -26,7 +26,7 @@ class TaskPolicy < ApplicationPolicy
   private
 
   def pm?
-    record.project.pm_id == user.id
+    record.project&.pm_id == user.id
   end
 
   def assignee?
