@@ -197,6 +197,8 @@ RSpec.describe "Api::V1::Tasks", type: :request do
            headers: auth_headers(kirk)
 
       expect(response).to have_http_status(:unprocessable_content)
+      json = JSON.parse(response.body)
+      expect(json["errors"][0]["detail"]).to include("does not exist")
     end
   end
 

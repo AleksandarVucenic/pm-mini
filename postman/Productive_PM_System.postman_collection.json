@@ -643,11 +643,13 @@
               "script": {
                 "exec": [
                   "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                  "const attrs = pm.response.json().data.attributes;",
+                  "const body = pm.response.json();",
+                  "const attrs = body.data.attributes;",
                   "pm.test('Has name', () => pm.expect(attrs.name).to.eql('Enterprise Refit'));",
-                  "pm.test('Has embedded pm with id/name/email', () => {",
-                  "  pm.expect(attrs.pm).to.have.all.keys('id', 'name', 'email');",
-                  "  pm.expect(attrs.pm.email).to.eql('kirk@enterprise.com');",
+                  "pm.test('Has pm relationship with pm in included', () => {",
+                  "  const pmId = body.data.relationships.pm.data.id;",
+                  "  const pmRecord = body.included.find(r => r.type === 'user' && r.id === pmId);",
+                  "  pm.expect(pmRecord.attributes.email).to.eql('kirk@enterprise.com');",
                   "});",
                   "pm.test('Has open_tasks_count and closed_tasks_count as numbers', () => {",
                   "  pm.expect(attrs.open_tasks_count).to.be.a('number');",
@@ -900,7 +902,11 @@
                 "exec": [
                   "pm.test('Status is 201', () => pm.response.to.have.status(201));",
                   "const body = pm.response.json();",
-                  "pm.test('PM is Spock, the creator', () => pm.expect(body.data.attributes.pm.email).to.eql('spock@enterprise.com'));",
+                  "pm.test('PM is Spock, the creator', () => {",
+                  "  const pmId = body.data.relationships.pm.data.id;",
+                  "  const pmRecord = body.included.find(r => r.type === 'user' && r.id === pmId);",
+                  "  pm.expect(pmRecord.attributes.email).to.eql('spock@enterprise.com');",
+                  "});",
                   "pm.collectionVariables.set('created_project_id', body.data.id);"
                 ],
                 "type": "text/javascript"
@@ -945,7 +951,9 @@
                 "exec": [
                   "const body = pm.response.json();",
                   "pm.test('PM is STILL Spock (the pm_id=1/Kirk in the body was ignored)', () => {",
-                  "  pm.expect(body.data.attributes.pm.email).to.eql('spock@enterprise.com');",
+                  "  const pmId = body.data.relationships.pm.data.id;",
+                  "  const pmRecord = body.included.find(r => r.type === 'user' && r.id === pmId);",
+                  "  pm.expect(pmRecord.attributes.email).to.eql('spock@enterprise.com');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1802,6 +1810,51 @@
           }
         },
         {
+          "name": "Task with non-existent assignee_id — expect 422",
+          "description": "Sending an assignee_id that does not exist in the users table triggers a FK violation — returns 422 with a clear error message.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 422', () => pm.response.to.have.status(422));",
+                  "const body = pm.response.json();",
+                  "pm.test('Error message mentions does not exist', () => pm.expect(body.errors[0].detail).to.include('does not exist'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{kirk_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": {\n    \"title\": \"Ghost assignee\",\n    \"project_id\": 1,\n    \"assignee_id\": 999999\n  }\n}"
+            }
+          }
+        },
+        {
           "name": "PM (Kirk) updates any field on an unassigned task in his project",
           "event": [
             {
@@ -2346,7 +2399,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (closed, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"status\": \"closed\"\n  }\n}"
+              "raw": "{\n  \"task\": {\n    \"title\": \"Sulu task 6 (closed, should be fine)\",\n    \"project_id\": 1,\n    \"assignee_id\": 6,\n    \"closed\": true\n  }\n}"
             }
           }
         },

@@ -15,7 +15,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   rescue_from ActiveRecord::InvalidForeignKey do |e|
-    render json: ErrorSerializer.from_message("Cannot delete this record because it is referenced elsewhere", status: :unprocessable_content), status: :unprocessable_content
+    render json: ErrorSerializer.from_message("Invalid reference: associated record does not exist", status: :unprocessable_content), status: :unprocessable_content
   end
 
   rescue_from ActionController::ParameterMissing do |e|
