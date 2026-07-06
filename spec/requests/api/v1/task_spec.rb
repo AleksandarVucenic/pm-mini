@@ -1,14 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Tasks", type: :request do
-  let(:kirk) { User.create!(name: "Kirk", email: "kirk_t@test.com", password: "123456789") }
-  let(:spock) { User.create!(name: "Spock", email: "spock_t@test.com", password: "123456789") }
+  let(:kirk) { User.create!(name: "Kirk", email: "kirk_t@test.com", password: "password123") }
+  let(:spock) { User.create!(name: "Spock", email: "spock_t@test.com", password: "password123") }
   let(:project) { Project.create!(name: "Enterprise Refit", pm: kirk) }
-
-  def auth_headers(user)
-    post "/api/v1/login", params: { user: { email: user.email, password: "123456789" } }
-    { "Authorization" => response.headers["Authorization"] }
-  end
 
   describe "GET /api/v1/tasks/:id" do
     it "returns the task to the PM" do
@@ -36,7 +31,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
     end
 
     it "returns 404 for a task outside the user's scope" do
-      other = User.create!(name: "McCoy", email: "mccoy_show@test.com", password: "123456789")
+      other = User.create!(name: "McCoy", email: "mccoy_show@test.com", password: "password123")
       task = Task.create!(title: "Not yours", project: project)
 
       get "/api/v1/tasks/#{task.id}", headers: auth_headers(other)
@@ -203,7 +198,7 @@ RSpec.describe "Api::V1::Tasks", type: :request do
   end
 
   describe "authorization" do
-    let(:mccoy) { User.create!(name: "McCoy", email: "mccoy_t@test.com", password: "123456789") }
+    let(:mccoy) { User.create!(name: "McCoy", email: "mccoy_t@test.com", password: "password123") }
 
     it "pm can see all tasks in their project, including unassigned ones" do
       Task.create!(title: "Assigned to Spock", project: project, assignee: spock)

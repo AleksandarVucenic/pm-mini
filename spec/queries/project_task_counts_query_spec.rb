@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe ProjectTaskCountsQuery do
-  let(:pm) { User.create!(name: "Kirk", email: "kirk_ptcq@test.com", password: "123456789") }
+  let(:pm) { User.create!(name: "Kirk", email: "kirk_ptcq@test.com", password: "password123") }
   let(:project_a) { Project.create!(name: "Project A", pm: pm) }
   let(:project_b) { Project.create!(name: "Project B", pm: pm) }
 

@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Task, type: :model do
-  let(:pm) { User.create!(name: "Kirk", email: "kirk_task@test.com", password: "sigurna123") }
-  let(:assignee) { User.create!(name: "Spock", email: "spock_task@test.com", password: "sigurna123") }
+  let(:pm) { User.create!(name: "Kirk", email: "kirk_task@test.com", password: "password123") }
+  let(:assignee) { User.create!(name: "Spock", email: "spock_task@test.com", password: "password123") }
   let(:project) { Project.create!(name: "Enterprise Refit", pm: pm) }
 
   describe "validations" do

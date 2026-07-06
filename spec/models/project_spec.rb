@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Project, type: :model do
-  let(:pm) { User.create!(name: "Kirk", email: "kirk_test@test.com", password: "12345678") }
+  let(:pm) { User.create!(name: "Kirk", email: "kirk_test@test.com", password: "password123") }
 
   describe "validations" do
     it "is valid with a name and a pm" do
@@ -25,10 +25,20 @@ RSpec.describe Project, type: :model do
     end
   end
 
-  describe "associations" do
-    it "belongs to a pm" do
+  describe "dependent destroy" do
+    it "destroys associated tasks when the project is deleted" do
       project = Project.create!(name: "Enterprise Refit", pm: pm)
-      expect(project.pm).to eq(pm)
+      Task.create!(title: "Fix warp core", project: project)
+
+      expect { project.destroy! }.to change(Task, :count).by(-1)
+    end
+  end
+
+  describe "pm restriction" do
+    it "prevents deleting a user who is PM of a project" do
+      Project.create!(name: "Enterprise Refit", pm: pm)
+
+      expect { pm.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
     end
   end
 end

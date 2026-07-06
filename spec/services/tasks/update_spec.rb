@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Tasks::Update do
-  let(:pm) { User.create!(name: "Kirk", email: "kirk_update@test.com", password: "12345678") }
+  let(:pm) { User.create!(name: "Kirk", email: "kirk_update@test.com", password: "password123") }
   let(:project) { Project.create!(name: "Enterprise Refit", pm: pm) }
 
   describe "#call" do
@@ -21,8 +21,8 @@ RSpec.describe Tasks::Update do
       expect { described_class.new(task).call }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "enforces the 5-open-task limit on reassignment" do
-      assignee = User.create!(name: "Spock", email: "spock_update@test.com", password: "12345678")
+    it "raises ActiveRecord::RecordInvalid when model validation fails (e.g. 5-task limit on reassignment)" do
+      assignee = User.create!(name: "Spock", email: "spock_update@test.com", password: "password123")
       5.times { |i| Task.create!(title: "Task #{i}", project: project, assignee: assignee) }
       task = Task.create!(title: "Unassigned", project: project)
       task.assign_attributes(assignee: assignee)

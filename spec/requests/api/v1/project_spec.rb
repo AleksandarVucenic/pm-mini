@@ -1,13 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Projects", type: :request do
-  let(:kirk) { User.create!(name: "Kirk", email: "kirk_p@test.com", password: "sigurna123") }
-  let(:spock) { User.create!(name: "Spock", email: "spock_p@test.com", password: "sigurna123") }
-
-  def auth_headers(user)
-    post "/api/v1/login", params: { user: { email: user.email, password: "sigurna123" } }
-    { "Authorization" => response.headers["Authorization"] }
-  end
+  let(:kirk) { User.create!(name: "Kirk", email: "kirk_p@test.com", password: "password123") }
+  let(:spock) { User.create!(name: "Spock", email: "spock_p@test.com", password: "password123") }
 
   describe "GET /api/v1/projects" do
     it "returns all projects to any authenticated user" do

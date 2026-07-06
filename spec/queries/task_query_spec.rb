@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe TaskQuery do
-  let(:pm) { User.create!(name: "Kirk", email: "kirk_tq@test.com", password: "sigurna123") }
+  let(:pm) { User.create!(name: "Kirk", email: "kirk_tq@test.com", password: "password123") }
   let(:project_a) { Project.create!(name: "Enterprise Refit", pm: pm) }
   let(:project_b) { Project.create!(name: "Voyager Refit", pm: pm) }
 
