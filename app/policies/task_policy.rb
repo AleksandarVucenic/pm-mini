@@ -20,7 +20,7 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    pm? ? [:title, :description, :closed, :project_id, :assignee_id] : [:title, :description, :closed]
+    pm? ? [ :title, :description, :closed, :project_id, :assignee_id ] : [ :title, :description, :closed ]
   end
 
   private
