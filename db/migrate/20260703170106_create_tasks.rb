@@ -10,7 +10,6 @@ class CreateTasks < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :tasks, :title
     add_index :tasks, [ :project_id, :assignee_id ]
   end
 end
