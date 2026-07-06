@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_074827) do
   create_table "jwt_denylists", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
@@ -22,7 +22,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
     t.string "name", null: false
     t.bigint "pm_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_projects_on_name"
     t.index ["pm_id"], name: "index_projects_on_pm_id"
   end
 
@@ -35,9 +34,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_130000) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["assignee_id"], name: "index_tasks_on_assignee_id"
-    t.index ["project_id", "assignee_id", "closed"], name: "index_tasks_on_project_id_and_assignee_id_and_closed"
+    t.index ["project_id", "assignee_id"], name: "index_tasks_on_project_id_and_assignee_id"
     t.index ["project_id"], name: "index_tasks_on_project_id"
-    t.index ["title"], name: "index_tasks_on_title"
     t.index ["updated_at"], name: "index_tasks_on_updated_at"
   end
 
